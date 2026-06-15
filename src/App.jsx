@@ -8,6 +8,8 @@ import PacienteHome from "./pages/PacienteHome";
 import RegistroForm from "./pages/RegistroForm";
 import Historico from "./pages/Historico";
 import RegistroDetalhe from "./pages/RegistroDetalhe";
+import RegistroCardioForm from "./pages/RegistroCardioForm";
+import HistoricoCardio from "./pages/HistoricoCardio";
 
 export default function App() {
   return (
@@ -44,10 +46,28 @@ export default function App() {
           />
 
           <Route
+            path="/pacientes/:id/registrar-cardio"
+            element={
+              <ProtectedRoute>
+                <RegistroCardioForm />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/pacientes/:id/historico"
             element={
               <ProtectedRoute>
                 <Historico />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/pacientes/:id/historico-cardio"
+            element={
+              <ProtectedRoute>
+                <HistoricoCardio />
               </ProtectedRoute>
             }
           />

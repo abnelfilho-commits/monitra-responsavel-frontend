@@ -1,7 +1,7 @@
 import { api } from "../lib/api";
 
 export async function listarPacientesResponsavel() {
-  const res = await api.get("/responsavel/pacientes");
+  const res = await api.get("/responsavel/pacientes/");
   return res.data;
 }
 

@@ -11,6 +11,9 @@ export default function Login() {
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const ambiente = import.meta.env.VITE_AMBIENTE;
+  const isHml = ambiente === "HML";
+
   async function handleSubmit(e) {
     e.preventDefault();
     setErro("");
@@ -46,6 +49,24 @@ export default function Login() {
             Monitoramento contínuo para uma saúde mais inteligente.
           </p>
         </div>
+
+        {isHml && (
+          <div
+            style={{
+              background: "#ffedd5",
+              color: "#9a3412",
+              border: "1px solid #fdba74",
+              borderRadius: 999,
+              padding: "6px 12px",
+              fontSize: 12,
+              fontWeight: 800,
+              marginBottom: 12,
+              display: "inline-block",
+            }}
+          >
+            HOMOLOGAÇÃO — APP RESPONSÁVEL
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.field}>

@@ -13,20 +13,30 @@ export default function PacienteHome() {
   const [erro, setErro] = useState("");
   const [jaRegistrouHoje, setJaRegistrouHoje] = useState(false);
 
+  const temNeuro = paciente?.modulos?.some((m) => m.slug === "neurodesenvolvimento");
+  const temCardio = paciente?.modulos?.some((m) => m.slug === "cardiometabolico");
+
   async function carregar() {
     try {
       setLoading(true);
       setErro("");
 
-      const [pacienteData, registrosData] = await Promise.all([
-        obterMeuPaciente(id),
-        listarRegistrosPaciente(id),
-      ]);
+      const pacienteData = await obterMeuPaciente(id);
 
       setPaciente(pacienteData);
 
+      let registros = [];
+
+      const temNeuroPaciente = pacienteData?.modulos?.some(
+        (m) => m.slug === "neurodesenvolvimento"
+      );
+
+      if (temNeuroPaciente) {
+        const registrosData = await listarRegistrosPaciente(id);
+        registros = Array.isArray(registrosData) ? registrosData : [];
+      }
+
       const hoje = new Date().toISOString().slice(0, 10);
-      const registros = Array.isArray(registrosData) ? registrosData : [];
 
       const existeRegistroHoje = registros.some(
         (registro) => registro?.data === hoje
@@ -96,21 +106,47 @@ export default function PacienteHome() {
               </div>
             )}
 
-            <button
-              onClick={() => navigate(`/pacientes/${id}/registrar`)}
-              style={styles.primaryButton}
-              type="button"
-            >
-              Registrar dia
-            </button>
+            {temNeuro ? (
+              <button
+                onClick={() => navigate(`/pacientes/${id}/registrar`)}
+                style={styles.primaryButton}
+                type="button"
+              >
+                Registrar Neuro
+              </button>
+            ) : null}
 
-            <button
-              onClick={() => navigate(`/pacientes/${id}/historico`)}
-              style={styles.secondaryButton}
-              type="button"
-            >
-              Ver histórico
-            </button>
+            {temCardio ? (
+              <button
+                onClick={() => navigate(`/pacientes/${id}/registrar-cardio`)}
+                style={styles.primaryButton}
+                type="button"
+              >
+                Registrar Cardiometabólico
+              </button>
+            ) : null}
+
+              {temNeuro && (
+                <button
+                  onClick={() =>
+                    navigate(`/pacientes/${id}/historico`)
+                  }
+                  style={styles.secondaryButton}
+                >
+                  Histórico Neuro
+                </button>
+              )}
+
+              {temCardio && (
+                <button
+                  onClick={() =>
+                    navigate(`/pacientes/${id}/historico-cardio`)
+                  }
+                  style={styles.secondaryButton}
+                >
+                  Histórico Cardiometabólico
+                </button>
+              )}
           </>
         ) : null}
       </div>
