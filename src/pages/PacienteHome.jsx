@@ -48,9 +48,10 @@ export default function PacienteHome() {
 
       const hoje = new Date().toISOString().slice(0, 10);
 
-      const existeRegistroHoje = registros.some(
-        (registro) => registro?.data === hoje
-      );
+      const existeRegistroHoje = registros.some((registro) => {
+        const dataRegistro = registro?.data || registro?.data_registro;
+        return dataRegistro?.slice(0, 10) === hoje;
+      });
 
       setJaRegistrouHoje(existeRegistroHoje);
     } catch (err) {
