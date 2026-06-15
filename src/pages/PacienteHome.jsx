@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { obterMeuPaciente } from "../services/pacientes";
 import { listarRegistrosPaciente } from "../services/registros";
+import { listarRegistrosCardio } from "../services/cardio";
 
 export default function PacienteHome() {
   const { id } = useParams();
@@ -31,8 +32,17 @@ export default function PacienteHome() {
         (m) => m.slug === "neurodesenvolvimento"
       );
 
+      const temCardioPaciente = pacienteData?.modulos?.some(
+        (m) => m.slug === "cardiometabolico"
+      );
+
       if (temNeuroPaciente) {
         const registrosData = await listarRegistrosPaciente(id);
+        registros = Array.isArray(registrosData) ? registrosData : [];
+      }
+
+      if (temCardioPaciente) {
+        const registrosData = await listarRegistrosCardio(id);
         registros = Array.isArray(registrosData) ? registrosData : [];
       }
 
