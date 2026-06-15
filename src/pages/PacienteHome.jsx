@@ -13,6 +13,7 @@ export default function PacienteHome() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
   const [jaRegistrouHoje, setJaRegistrouHoje] = useState(false);
+  const [jaRegistrouOntem, setJaRegistrouOntem] = useState(false);
 
   const temNeuro = paciente?.modulos?.some((m) => m.slug === "neurodesenvolvimento");
   const temCardio = paciente?.modulos?.some((m) => m.slug === "cardiometabolico");
@@ -48,12 +49,23 @@ export default function PacienteHome() {
 
       const hoje = new Date().toISOString().slice(0, 10);
 
+      const ontemDate = new Date();
+      ontemDate.setDate(ontemDate.getDate() - 1);
+      const ontem = ontemDate.toISOString().slice(0, 10);
+
       const existeRegistroHoje = registros.some((registro) => {
         const dataRegistro = registro?.data || registro?.data_registro;
         return dataRegistro?.slice(0, 10) === hoje;
       });
 
+      const existeRegistroOntem = registros.some((registro) => {
+        const dataRegistro = registro?.data || registro?.data_registro;
+        return dataRegistro?.slice(0, 10) === ontem;
+      });
+
       setJaRegistrouHoje(existeRegistroHoje);
+      setJaRegistrouOntem(existeRegistroOntem);
+
     } catch (err) {
       setErro(err?.response?.data?.detail || "Erro ao carregar paciente.");
     } finally {
@@ -126,13 +138,15 @@ export default function PacienteHome() {
               </button>
             ) : null}
 
-            {temCardio && !jaRegistrouHoje ? (
+            {temCardio && (!jaRegistrouHoje || !jaRegistrouOntem) ? (
               <button
                 onClick={() => navigate(`/pacientes/${id}/registrar-cardio`)}
                 style={styles.primaryButton}
                 type="button"
               >
-                Registrar Cardiometabólico
+                {jaRegistrouHoje && !jaRegistrouOntem
+                  ? "Registrar Cardiometabólico de Ontem"
+                  : "Registrar Cardiometabólico"}
               </button>
             ) : null}
 
