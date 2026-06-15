@@ -119,7 +119,11 @@ export default function PacienteHome() {
               <div style={styles.successBox}>Registro enviado com sucesso.</div>
             ) : null}
 
-            {jaRegistrouHoje ? (
+            {jaRegistrouHoje && jaRegistrouOntem ? (
+              <div style={styles.infoDoneBox}>
+                ✅ Os registros de hoje e ontem já foram enviados.
+              </div>
+            ) : jaRegistrouHoje ? (
               <div style={styles.infoDoneBox}>
                 ✅ O registro de hoje já foi enviado. Você ainda pode registrar ontem, se necessário.
               </div>
@@ -128,6 +132,7 @@ export default function PacienteHome() {
                 ⚠️ Como foi o dia hoje? Ainda não registramos.
               </div>
             )}
+            
             {temNeuro && !jaRegistrouHoje ? (
               <button
                 onClick={() => navigate(`/pacientes/${id}/registrar`)}
