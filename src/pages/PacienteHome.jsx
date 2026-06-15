@@ -115,8 +115,7 @@ export default function PacienteHome() {
                 ⚠️ Como foi o dia hoje? Ainda não registramos.
               </div>
             )}
-
-            {temNeuro ? (
+            {temNeuro && !jaRegistrouHoje ? (
               <button
                 onClick={() => navigate(`/pacientes/${id}/registrar`)}
                 style={styles.primaryButton}
@@ -126,7 +125,7 @@ export default function PacienteHome() {
               </button>
             ) : null}
 
-            {temCardio ? (
+            {temCardio && !jaRegistrouHoje ? (
               <button
                 onClick={() => navigate(`/pacientes/${id}/registrar-cardio`)}
                 style={styles.primaryButton}
