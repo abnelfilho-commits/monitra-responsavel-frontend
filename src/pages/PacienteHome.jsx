@@ -12,11 +12,14 @@ export default function PacienteHome() {
   const [paciente, setPaciente] = useState(null);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
-  const [jaRegistrouHoje, setJaRegistrouHoje] = useState(false);
-  const [jaRegistrouOntem, setJaRegistrouOntem] = useState(false);
 
   const temNeuro = paciente?.modulos?.some((m) => m.slug === "neurodesenvolvimento");
   const temCardio = paciente?.modulos?.some((m) => m.slug === "cardiometabolico");
+
+  const [jaRegistrouNeuroHoje, setJaRegistrouNeuroHoje] = useState(false);
+  const [jaRegistrouNeuroOntem, setJaRegistrouNeuroOntem] = useState(false);
+  const [jaRegistrouCardioHoje, setJaRegistrouCardioHoje] = useState(false);
+  const [jaRegistrouCardioOntem, setJaRegistrouCardioOntem] = useState(false);
 
   async function carregar() {
     try {
@@ -27,8 +30,6 @@ export default function PacienteHome() {
 
       setPaciente(pacienteData);
 
-      let registros = [];
-
       const temNeuroPaciente = pacienteData?.modulos?.some(
         (m) => m.slug === "neurodesenvolvimento"
       );
@@ -37,14 +38,17 @@ export default function PacienteHome() {
         (m) => m.slug === "cardiometabolico"
       );
 
+      let registrosNeuro = [];
+      let registrosCardio = [];
+
       if (temNeuroPaciente) {
         const registrosData = await listarRegistrosPaciente(id);
-        registros = Array.isArray(registrosData) ? registrosData : [];
+        registrosNeuro = Array.isArray(registrosData) ? registrosData : [];
       }
 
       if (temCardioPaciente) {
         const registrosData = await listarRegistrosCardio(id);
-        registros = Array.isArray(registrosData) ? registrosData : [];
+        registrosCardio = Array.isArray(registrosData) ? registrosData : [];
       }
 
       const hoje = new Date().toISOString().slice(0, 10);
@@ -53,18 +57,21 @@ export default function PacienteHome() {
       ontemDate.setDate(ontemDate.getDate() - 1);
       const ontem = ontemDate.toISOString().slice(0, 10);
 
-      const existeRegistroHoje = registros.some((registro) => {
-        const dataRegistro = registro?.data || registro?.data_registro;
-        return dataRegistro?.slice(0, 10) === hoje;
-      });
+      setJaRegistrouNeuroHoje(
+        registrosNeuro.some((registro) => registro?.data?.slice(0, 10) === hoje)
+      );
 
-      const existeRegistroOntem = registros.some((registro) => {
-        const dataRegistro = registro?.data || registro?.data_registro;
-        return dataRegistro?.slice(0, 10) === ontem;
-      });
+      setJaRegistrouNeuroOntem(
+        registrosNeuro.some((registro) => registro?.data?.slice(0, 10) === ontem)
+      );
 
-      setJaRegistrouHoje(existeRegistroHoje);
-      setJaRegistrouOntem(existeRegistroOntem);
+      setJaRegistrouCardioHoje(
+        registrosCardio.some((registro) => registro?.data_registro?.slice(0, 10) === hoje)
+      );
+
+      setJaRegistrouCardioOntem(
+        registrosCardio.some((registro) => registro?.data_registro?.slice(0, 10) === ontem)
+      );
 
     } catch (err) {
       setErro(err?.response?.data?.detail || "Erro ao carregar paciente.");
@@ -119,63 +126,79 @@ export default function PacienteHome() {
               <div style={styles.successBox}>Registro enviado com sucesso.</div>
             ) : null}
 
-            {jaRegistrouHoje && jaRegistrouOntem ? (
+            {temNeuro && jaRegistrouNeuroHoje && jaRegistrouNeuroOntem ? (
               <div style={styles.infoDoneBox}>
-                ✅ Os registros de hoje e ontem já foram enviados.
+                ✅ Os registros Neuro de hoje e ontem já foram enviados.
               </div>
-            ) : jaRegistrouHoje ? (
+            ) : temNeuro && jaRegistrouNeuroHoje ? (
               <div style={styles.infoDoneBox}>
-                ✅ O registro de hoje já foi enviado. Você ainda pode registrar ontem, se necessário.
+                ✅ O registro Neuro de hoje já foi enviado. Você ainda pode registrar ontem, se necessário.
               </div>
-            ) : (
+            ) : temNeuro ? (
               <div style={styles.warningBox}>
-                ⚠️ Como foi o dia hoje? Ainda não registramos.
+                ⚠️ Como foi o dia hoje? Ainda não registramos o acompanhamento Neuro.
               </div>
-            )}
+            ) : null}
+
+            {temCardio && jaRegistrouCardioHoje && jaRegistrouCardioOntem ? (
+              <div style={styles.infoDoneBox}>
+                ✅ Os registros Cardiometabólicos de hoje e ontem já foram enviados.
+              </div>
+            ) : temCardio && jaRegistrouCardioHoje ? (
+              <div style={styles.infoDoneBox}>
+                ✅ O registro Cardiometabólico de hoje já foi enviado. Você ainda pode registrar ontem, se necessário.
+              </div>
+            ) : temCardio ? (
+              <div style={styles.warningBox}>
+                ⚠️ Ainda não registramos o acompanhamento Cardiometabólico de hoje.
+              </div>
+            ) : null}
             
-            {temNeuro && !jaRegistrouHoje ? (
+            {temNeuro && (!jaRegistrouNeuroHoje || !jaRegistrouNeuroOntem) ? (
               <button
                 onClick={() => navigate(`/pacientes/${id}/registrar`)}
                 style={styles.primaryButton}
                 type="button"
               >
-                Registrar Neuro
+                {jaRegistrouNeuroHoje && !jaRegistrouNeuroOntem
+                  ? "🧠 Registrar Neuro de Ontem"
+                  : "🧠 Registro Diário - Neuro"}
               </button>
             ) : null}
 
-            {temCardio && (!jaRegistrouHoje || !jaRegistrouOntem) ? (
+            {temCardio && (!jaRegistrouCardioHoje || !jaRegistrouCardioOntem) ? (
               <button
                 onClick={() => navigate(`/pacientes/${id}/registrar-cardio`)}
                 style={styles.primaryButton}
                 type="button"
               >
-                {jaRegistrouHoje && !jaRegistrouOntem
-                  ? "Registrar Cardiometabólico de Ontem"
-                  : "Registrar Cardiometabólico"}
+                {jaRegistrouCardioHoje && !jaRegistrouCardioOntem
+                  ? "❤️ Registrar Cardiometabólico de Ontem"
+                  : "❤️ Registro Diário - Cardiometabólico"}
               </button>
             ) : null}
 
-              {temNeuro && (
-                <button
-                  onClick={() =>
-                    navigate(`/pacientes/${id}/historico`)
-                  }
-                  style={styles.secondaryButton}
-                >
-                  Histórico Neuro
-                </button>
-              )}
+            {temNeuro && (
+              <button
+                onClick={() =>
+                  navigate(`/pacientes/${id}/historico`)
+                }
+                style={styles.secondaryButton}
+              >
+                Histórico Neuro
+              </button>
+            )}
 
-              {temCardio && (
-                <button
-                  onClick={() =>
-                    navigate(`/pacientes/${id}/historico-cardio`)
-                  }
-                  style={styles.secondaryButton}
-                >
-                  Histórico Cardiometabólico
-                </button>
-              )}
+            {temCardio && (
+              <button
+                onClick={() =>
+                  navigate(`/pacientes/${id}/historico-cardio`)
+                }
+                style={styles.secondaryButton}
+              >
+                Histórico Cardiometabólico
+              </button>
+            )}
           </>
         ) : null}
       </div>

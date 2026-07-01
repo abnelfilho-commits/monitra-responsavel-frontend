@@ -84,7 +84,8 @@ export default function RegistroDetalhe() {
           <p><strong>Consistência das fezes:</strong> {registro.consistencia_fezes ?? "-"}</p>
           <p><strong>Irritabilidade:</strong> {registro.irritabilidade ?? "-"}</p>
           <p><strong>Crise sensorial:</strong> {registro.crise_sensorial ?? "-"}</p>
-          <p><strong>Alimentação:</strong> {registro.alimentacao || "-"}</p>
+          <p><strong>Tempo de tela:</strong> {registro.tempo_tela || "-"}</p>
+          <p><strong>Seletividade alimentar:</strong> {registro.seletividade_alimentar || "-"}</p>
           <p><strong>Observação:</strong> {registro.observacao || "-"}</p>
         </div>
       </div>

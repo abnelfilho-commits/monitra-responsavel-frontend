@@ -20,7 +20,8 @@ export default function RegistroForm() {
     consistencia_fezes: "",
     irritabilidade: "",
     crise_sensorial: "",
-    alimentacao: "",
+    tempo_tela: "",
+    seletividade_alimentar: "",
     observacao: "",
   });
 
@@ -113,9 +114,12 @@ export default function RegistroForm() {
         consistencia_fezes: toIntOrNull(form.consistencia_fezes),
         irritabilidade: toIntOrNull(form.irritabilidade),
         crise_sensorial: toIntOrNull(form.crise_sensorial),
-        alimentacao: form.alimentacao?.trim() || null,
+        tempo_tela: form.tempo_tela || null,
+        seletividade_alimentar: form.seletividade_alimentar || null,
         observacao: form.observacao?.trim() || null,
       };
+
+      console.log("PAYLOAD REGISTRO NEURO:", payload);
 
       await criarRegistroPaciente(id, payload);
 
@@ -276,14 +280,39 @@ export default function RegistroForm() {
 
           <div style={styles.card}>
             <label style={styles.label}>
-              Como foi a alimentação {referenciaDia}?
-              <textarea
-                style={styles.textarea}
-                value={form.alimentacao}
-                onChange={(e) => updateField("alimentacao", e.target.value)}
-                placeholder={`Descreva como foi a alimentação ${referenciaDia}`}
+              Tempo de tela {referenciaDia}
+              <select
+                style={styles.input}
+                value={form.tempo_tela}
+                onChange={(e) => updateField("tempo_tela", e.target.value)}
                 disabled={bloqueadoTotal}
-              />
+              >
+                <option value="">Selecione</option>
+                <option value="MENOS_1H">Menos de 1 hora</option>
+                <option value="1_2H">1 a 2 horas</option>
+                <option value="2_4H">2 a 4 horas</option>
+                <option value="MAIS_4H">Mais de 4 horas</option>
+              </select>
+            </label>
+          </div>
+
+          <div style={styles.card}>
+            <label style={styles.label}>
+              Seletividade alimentar {referenciaDia}
+              <select
+                style={styles.input}
+                value={form.seletividade_alimentar}
+                onChange={(e) =>
+                  updateField("seletividade_alimentar", e.target.value)
+                }
+                disabled={bloqueadoTotal}
+              >
+                <option value="">Selecione</option>
+                <option value="NENHUMA">Nenhuma</option>
+                <option value="LEVE">Leve</option>
+                <option value="MODERADA">Moderada</option>
+                <option value="INTENSA">Intensa</option>
+              </select>
             </label>
           </div>
 

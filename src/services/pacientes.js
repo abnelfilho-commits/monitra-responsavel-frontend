@@ -6,7 +6,8 @@ export async function listarPacientesResponsavel() {
 }
 
 export async function listarMeusPacientes() {
-  return listarPacientesResponsavel();
+  const res = await api.get("/responsavel/pacientes/");
+  return res.data;
 }
 
 export async function obterPacienteResponsavel(id) {
@@ -14,6 +15,8 @@ export async function obterPacienteResponsavel(id) {
   return res.data;
 }
 
+
 export async function obterMeuPaciente(id) {
-  return obterPacienteResponsavel(id);
+  const res = await api.get(`/responsavel/pacientes/${id}`);
+  return res.data;
 }

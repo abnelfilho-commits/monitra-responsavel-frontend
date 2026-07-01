@@ -32,8 +32,10 @@ export default function RegistroCardioForm() {
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const [datasBloqueadas, setDatasBloqueadas] = useState([]);
-
+  const [loadingDatas, setLoadingDatas] = useState(true);
+  const [jaTemHoje, setJaTemHoje] = useState(false);
+  const [jaTemOntem, setJaTemOntem] = useState(false);
+  
   function updateField(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
@@ -53,36 +55,62 @@ export default function RegistroCardioForm() {
       return "Preencha os dados cardiometabólicos de ontem";
     }
 
+  const bloqueadoTotal =
+    jaTemHoje && jaTemOntem;
+
     return "Preencha os dados cardiometabólicos de hoje";
   }, [form.data, ontemStr]);
 
   async function carregarRegistros() {
     try {
-      const registros =
-        await listarRegistrosCardio(id);
+      setLoadingDatas(true);
+      setErro("");
 
-      setDatasBloqueadas(
-        registros.map((r) => r.data_registro)
+      const registros = await listarRegistrosCardio(id);
+      const lista = Array.isArray(registros) ? registros : [];
+
+      const temHoje = lista.some(
+        (r) => r.data_registro === hojeStr
       );
+
+      const temOntem = lista.some(
+        (r) => r.data_registro === ontemStr
+      );
+
+      setJaTemHoje(temHoje);
+      setJaTemOntem(temOntem);
+
+      if (temHoje && !temOntem) {
+        setForm((prev) => ({
+          ...prev,
+          data: ontemStr,
+        }));
+      } else if (!temHoje) {
+        setForm((prev) => ({
+          ...prev,
+          data: hojeStr,
+        }));
+      } else if (temHoje && temOntem) {
+        setForm((prev) => ({
+          ...prev,
+          data: "",
+        }));
+      }
+
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoadingDatas(false);
     }
   }
 
-useEffect(() => {
-  carregarRegistros();
-}, [id]);
+  useEffect(() => {
+    carregarRegistros();
+  }, [id]);
 
   async function handleSubmit(e) {
     e.preventDefault();
     setErro("");
-
-    if (datasBloqueadas.includes(form.data)) {
-    setErro(
-        "Já existe registro cardiometabólico para esta data."
-    );
-    return;
-    }
 
     if (!form.data) {
       setErro("Informe a data do registro.");
@@ -141,17 +169,53 @@ useEffect(() => {
           <p style={styles.subtitle}>{subtitulo}</p>
         </div>
 
+        {loadingDatas && (
+          <div style={styles.infoBox}>
+            Validando datas disponíveis...
+          </div>
+        )}
+
+        {!loadingDatas && jaTemHoje && !jaTemOntem && (
+          <div style={styles.warningBox}>
+            ✅ O registro de hoje já foi enviado.
+            Você ainda pode registrar ontem.
+          </div>
+        )}
+
+        {!loadingDatas && bloqueadoTotal && (
+          <div style={styles.infoDoneBox}>
+            ✅ Já existem registros para hoje e ontem.
+            Nenhuma nova data está disponível.
+          </div>
+        )}
+
         <form style={styles.form} onSubmit={handleSubmit}>
           <div style={styles.card}>
             <label style={styles.label}>
               Data
               <select
-                style={styles.input}
-                value={form.data}
-                onChange={(e) => updateField("data", e.target.value)}
+                  style={styles.input}
+                  value={form.data}
+                  onChange={(e) =>
+                      updateField("data", e.target.value)
+                  }
+                  disabled={bloqueadoTotal || loadingDatas}
               >
-                <option value={hojeStr}>Hoje</option>
-                <option value={ontemStr}>Ontem</option>
+                  <option value="">Selecione</option>
+
+                  <option
+                      value={hojeStr}
+                      disabled={jaTemHoje}
+                  >
+                      Hoje {jaTemHoje ? "(já registrado)" : ""}
+                  </option>
+
+                  <option
+                      value={ontemStr}
+                      disabled={jaTemOntem}
+                  >
+                      Ontem {jaTemOntem ? "(já registrado)" : ""}
+                  </option>
               </select>
             </label>
           </div>
@@ -266,9 +330,17 @@ useEffect(() => {
               ...(loading ? styles.buttonDisabled : {}),
             }}
             type="submit"
-            disabled={loading}
+            disabled={
+                loading ||
+                bloqueadoTotal ||
+                loadingDatas
+            }
           >
-            {loading ? "Enviando..." : "Enviar registro"}
+            {loading
+                ? "Enviando..."
+                : bloqueadoTotal
+                ? "Nenhuma data disponível"
+                : "Enviar registro"}
           </button>
         </form>
       </div>

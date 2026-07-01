@@ -82,39 +82,25 @@ export default function HistoricoCardio() {
 
         <div style={styles.list}>
           {registros.map((registro) => (
-            <div
+            <button
               key={registro.id}
+              onClick={() =>
+                navigate(`/registros-cardio/${registro.id}`)
+              }
               style={styles.card}
             >
               <div>
                 <h2 style={styles.cardDate}>
-                  {formatarData(
-                    registro.data_registro
-                  )}
+                  {formatarData(registro.data_registro)}
                 </h2>
 
                 <p style={styles.cardText}>
-                  Glicemia: {registro.glicemia_jejum ?? "-"}
-                </p>
-
-                <p style={styles.cardText}>
-                  PA: {registro.pressao_sistolica ?? "-"} x{" "}
-                  {registro.pressao_diastolica ?? "-"}
-                </p>
-
-                <p style={styles.cardText}>
-                  Peso: {registro.peso ?? "-"} kg
-                </p>
-
-                <p style={styles.cardRisk}>
-                  Risco: {registro.risco}
-                </p>
-
-                <p style={styles.cardRisk}>
-                  Score: {registro.score_clinico}
+                  Toque para visualizar o detalhe do registro
                 </p>
               </div>
-            </div>
+
+              <span style={styles.arrow}>›</span>
+            </button>
           ))}
         </div>
       </div>
@@ -165,12 +151,17 @@ const styles = {
     gap: 12,
   },
   card: {
+    width: "100%",
     background: "#fff",
     border: "1px solid #e2e8f0",
     borderRadius: 18,
     padding: 18,
-    boxShadow:
-      "0 6px 18px rgba(15, 23, 42, 0.05)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    textAlign: "left",
+    cursor: "pointer",
+    boxShadow: "0 6px 18px rgba(15, 23, 42, 0.05)",
   },
   cardDate: {
     margin: 0,
@@ -204,5 +195,10 @@ const styles = {
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
+  },
+    arrow: {
+    fontSize: 28,
+    color: "#94a3b8",
+    lineHeight: 1,
   },
 };
