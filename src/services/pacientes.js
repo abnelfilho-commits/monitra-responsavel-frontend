@@ -11,12 +11,12 @@ export async function listarMeusPacientes() {
 }
 
 export async function obterPacienteResponsavel(id) {
-  const res = await api.get(`/responsavel/pacientes/${id}`);
+  const res = await api.get(`/responsavel/pacientes${id}`);
   return res.data;
 }
 
 
 export async function obterMeuPaciente(id) {
-  const res = await api.get(`/responsavel/pacientes/${id}`);
+  const res = await api.get(`/responsavel/pacientes${id}`);
   return res.data;
 }
