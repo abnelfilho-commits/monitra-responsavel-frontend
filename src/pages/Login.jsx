@@ -40,8 +40,8 @@ export default function Login() {
       <div style={styles.container}>
         <div style={styles.logoContainer}>
           <img
-            src="/logo-monitra.png"
-            alt="Monitra"
+            src="/logo-integracare.png"
+            alt="Integra Care"
             style={styles.logo}
           />
 
@@ -116,7 +116,7 @@ export default function Login() {
         </form>
 
         <div style={styles.footer}>
-          <span>© Monitra</span>
+          <span>© Integra Care</span>
         </div>
       </div>
     </div>
